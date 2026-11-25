@@ -26,6 +26,8 @@ export type Course = {
   hours_practical?: number | null
   hours_research_virtual?: number | null
   hours_independent?: number | null
+  prerequisite?: string | null
+  facilitator?: string | null
 }
 
 export type Experience = {
