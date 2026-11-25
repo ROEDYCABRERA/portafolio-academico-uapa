@@ -20,6 +20,12 @@ export type Course = {
   description: string | null
   is_placeholder: boolean
   status: 'pending' | 'in_progress' | 'review' | 'completed'
+  course_code?: string | null
+  credits?: number | null
+  hours_theoretical?: number | null
+  hours_practical?: number | null
+  hours_research_virtual?: number | null
+  hours_independent?: number | null
 }
 
 export type Experience = {
