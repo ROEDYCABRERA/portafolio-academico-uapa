@@ -38,7 +38,7 @@ function ParticipantCard({ participant }: { participant: Participant }) {
     <CardContent className="p-5 sm:p-6">
       <div className="flex items-center gap-4">
         <div className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-blue-50 text-sm font-bold text-[#0B2545]">
-          {participant.photo_path ? <img src={participant.photo_path} alt={`Fotografía de ${participant.full_name || participant.code}`} className="size-full object-cover" /> : participant.code}
+          {participant.photo_path ? <img src={participant.photo_path} alt={`Fotografía de ${participant.full_name || participant.code}`} loading="lazy" decoding="async" className="size-full object-cover" /> : participant.code}
         </div>
         <div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-[.16em] text-blue-700">Participante {participant.code}</p><h3 className="mt-1 truncate font-semibold text-[#0B2545]">{participant.full_name || 'Perfil por completar'}</h3></div>
       </div>
@@ -81,22 +81,22 @@ function MetricCard({ label, abbreviation, value, detail, icon: Icon }: { label:
 }
 
 export function PublicPortfolio({ view = 'home', trimester }: { view?: PortfolioView; trimester?: number }) {
-  const { data: participants, isLoading: loadingParticipants } = usePortfolioData<Participant>('public-participants', 'portfolio_participants', 'id,code,full_name,professional_area,photo_path,bio,participation_status,joined_at,publication_status', ['publication_status', 'published'])
-  const { data: courses, isLoading: loadingCourses } = usePortfolioData<Course>('public-courses', 'portfolio_courses', 'id,trimester,course_number,course_code,credits,hours_theoretical,hours_practical,hours_research_virtual,hours_independent,title,description,is_placeholder,status,prerequisite,facilitator,publication_status', ['publication_status', 'published'])
-  const { data: experiences, isLoading: loadingExperiences } = usePortfolioData<Experience>('public-experiences', 'portfolio_experiences', 'id,participant_id,course_id,title,description,learning_date,status,created_at', ['status', 'published'])
-  const { data: reflections } = usePortfolioData<Reflection>('public-group-reflection', 'portfolio_reflections', 'id,participant_id,course_id,title,body,reflection_type,status,created_at', ['status', 'published'])
-  const { data: evidence } = usePortfolioData<Evidence>('public-evidence', 'portfolio_evidence', 'id,experience_id,title,storage_path,mime_type,file_size,status,created_at', ['status', 'published'])
-  const { data: curriculumRow } = useSWR('portfolio-curriculum-settings', async () => {
+  const { data: participants, isLoading: loadingParticipants, error: participantsError } = usePortfolioData<Participant>('public-participants', 'portfolio_participants', 'id,code,full_name,professional_area,photo_path,bio,participation_status,joined_at,publication_status', ['publication_status', 'published'])
+  const { data: courses, isLoading: loadingCourses, error: coursesError } = usePortfolioData<Course>('public-courses', 'portfolio_courses', 'id,trimester,course_number,course_code,credits,hours_theoretical,hours_practical,hours_research_virtual,hours_independent,title,description,is_placeholder,status,prerequisite,facilitator,publication_status', ['publication_status', 'published'])
+  const { data: experiences, isLoading: loadingExperiences, error: experiencesError } = usePortfolioData<Experience>('public-experiences', 'portfolio_experiences', 'id,participant_id,course_id,title,description,learning_date,status,created_at', ['status', 'published'])
+  const { data: reflections, error: reflectionsError } = usePortfolioData<Reflection>('public-group-reflection', 'portfolio_reflections', 'id,participant_id,course_id,title,body,reflection_type,status,created_at', ['status', 'published'])
+  const { data: evidence, error: evidenceError } = usePortfolioData<Evidence>('public-evidence', 'portfolio_evidence', 'id,experience_id,title,storage_path,mime_type,file_size,status,created_at', ['status', 'published'])
+  const { data: curriculumRow, error: curriculumError } = useSWR('portfolio-curriculum-settings', async () => {
     const { data, error } = await supabase.from('portfolio_settings').select('value').eq('key', 'curriculum').eq('publication_status', 'published').maybeSingle()
     if (error) throw error
     return (data?.value || {}) as { institution?: string; decree?: string; pensum_year?: string; duration?: string; modalities?: string[]; declared_totals?: Record<string, number>; trimesters?: Record<string, Record<string, number>> }
   })
-  const { data: settingsRow } = useSWR('portfolio-public-settings', async () => {
+  const { data: settingsRow, error: settingsError } = useSWR('portfolio-public-settings', async () => {
     const { data, error } = await supabase.from('portfolio_settings').select('value').eq('key', 'institution').eq('publication_status', 'published').maybeSingle()
     if (error) throw error
     return (data?.value || {}) as PublicSettings
   })
-  const { data: evidenceLinks } = useSWR(evidence?.length ? ['portfolio-public-evidence-links', evidence.map((item) => item.id).join(',')] : null, async () => {
+  const { data: evidenceLinks, error: evidenceLinksError } = useSWR(evidence?.length ? ['portfolio-public-evidence-links', evidence.map((item) => item.id).join(',')] : null, async () => {
     const links = await Promise.all((evidence || []).map(async (item) => {
       const { data } = await supabase.storage.from('portfolio-evidence').createSignedUrl(item.storage_path, 3600)
       return [item.id, data?.signedUrl || ''] as const
@@ -104,6 +104,7 @@ export function PublicPortfolio({ view = 'home', trimester }: { view?: Portfolio
     return Object.fromEntries(links)
   })
 
+  const hasPublicDataError = Boolean(participantsError || coursesError || experiencesError || reflectionsError || evidenceError || curriculumError || settingsError || evidenceLinksError)
   const people = participants ?? []
   const curriculum = courses ?? []
   const totalCourses = curriculum.length
@@ -150,6 +151,7 @@ export function PublicPortfolio({ view = 'home', trimester }: { view?: Portfolio
     <PortfolioSidebar completedCourses={completedCourses} totalCourses={totalCourses} loading={loadingCourses} />
     <div className="min-w-0 flex-1 md:ml-[264px]">
       <main className="mx-auto min-h-screen max-w-[1500px] px-4 pb-12 pt-6 sm:px-6 md:px-8 md:pt-9 lg:px-10">
+        {hasPublicDataError && <div role="alert" className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950">No se pudo cargar parte de la información. Actualiza la página para volver a intentarlo.</div>}
         <header className="mb-7 flex flex-wrap items-start justify-between gap-4">
           <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-blue-700">{heading.eyebrow}</p><h1 className="mt-2 max-w-3xl font-heading text-2xl font-bold leading-tight tracking-tight text-[#0B2545] sm:text-3xl">{heading.title}</h1><p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{heading.description}</p></div>
           <div className="flex items-center gap-2"><Badge variant="secondary" className="rounded-lg px-3 py-1.5">Pénsum {year}</Badge><Link href="/admin" className="hidden min-h-9 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-[#0B2545] transition hover:border-blue-200 hover:bg-blue-50 sm:inline-flex"><Users aria-hidden="true" size={15} />Administrar</Link></div>
