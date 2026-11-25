@@ -10,6 +10,8 @@ export type Participant = {
   participation_status: 'active' | 'paused' | 'completed'
   joined_at: string
   user_id?: string | null
+  publication_status?: 'draft' | 'review' | 'published'
+  updated_at?: string
 }
 
 export type Course = {
@@ -28,6 +30,8 @@ export type Course = {
   hours_independent?: number | null
   prerequisite?: string | null
   facilitator?: string | null
+  publication_status?: 'draft' | 'review' | 'published'
+  updated_at?: string
 }
 
 export type Experience = {
@@ -43,6 +47,7 @@ export type Experience = {
   learning_date: string | null
   status: 'draft' | 'review' | 'published'
   created_at: string
+  updated_at?: string
 }
 
 export type Evidence = {
@@ -54,6 +59,7 @@ export type Evidence = {
   mime_type: string | null
   file_size: number | null
   status: 'draft' | 'review' | 'published'
+  updated_at?: string
 }
 
 export type Reflection = {
@@ -65,6 +71,7 @@ export type Reflection = {
   reflection_type: 'individual' | 'group'
   status: 'draft' | 'review' | 'published'
   created_at: string
+  updated_at?: string
 }
 
 export const STATUS_LABELS: Record<string, string> = {

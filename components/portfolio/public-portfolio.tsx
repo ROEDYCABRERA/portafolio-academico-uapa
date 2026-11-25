@@ -81,18 +81,18 @@ function MetricCard({ label, abbreviation, value, detail, icon: Icon }: { label:
 }
 
 export function PublicPortfolio({ view = 'home', trimester }: { view?: PortfolioView; trimester?: number }) {
-  const { data: participants, isLoading: loadingParticipants } = usePortfolioData<Participant>('public-participants', 'portfolio_participants', 'id,code,full_name,professional_area,photo_path,bio,participation_status,joined_at')
-  const { data: courses, isLoading: loadingCourses } = usePortfolioData<Course>('public-courses', 'portfolio_courses', 'id,trimester,course_number,course_code,credits,hours_theoretical,hours_practical,hours_research_virtual,hours_independent,title,description,is_placeholder,status,prerequisite,facilitator')
+  const { data: participants, isLoading: loadingParticipants } = usePortfolioData<Participant>('public-participants', 'portfolio_participants', 'id,code,full_name,professional_area,photo_path,bio,participation_status,joined_at,publication_status', ['publication_status', 'published'])
+  const { data: courses, isLoading: loadingCourses } = usePortfolioData<Course>('public-courses', 'portfolio_courses', 'id,trimester,course_number,course_code,credits,hours_theoretical,hours_practical,hours_research_virtual,hours_independent,title,description,is_placeholder,status,prerequisite,facilitator,publication_status', ['publication_status', 'published'])
   const { data: experiences, isLoading: loadingExperiences } = usePortfolioData<Experience>('public-experiences', 'portfolio_experiences', 'id,participant_id,course_id,title,description,learning_date,status,created_at', ['status', 'published'])
   const { data: reflections } = usePortfolioData<Reflection>('public-group-reflection', 'portfolio_reflections', 'id,participant_id,course_id,title,body,reflection_type,status,created_at', ['status', 'published'])
   const { data: evidence } = usePortfolioData<Evidence>('public-evidence', 'portfolio_evidence', 'id,experience_id,title,storage_path,mime_type,file_size,status,created_at', ['status', 'published'])
   const { data: curriculumRow } = useSWR('portfolio-curriculum-settings', async () => {
-    const { data, error } = await supabase.from('portfolio_settings').select('value').eq('key', 'curriculum').maybeSingle()
+    const { data, error } = await supabase.from('portfolio_settings').select('value').eq('key', 'curriculum').eq('publication_status', 'published').maybeSingle()
     if (error) throw error
     return (data?.value || {}) as { institution?: string; decree?: string; pensum_year?: string; duration?: string; modalities?: string[]; declared_totals?: Record<string, number>; trimesters?: Record<string, Record<string, number>> }
   })
   const { data: settingsRow } = useSWR('portfolio-public-settings', async () => {
-    const { data, error } = await supabase.from('portfolio_settings').select('value').eq('key', 'institution').maybeSingle()
+    const { data, error } = await supabase.from('portfolio_settings').select('value').eq('key', 'institution').eq('publication_status', 'published').maybeSingle()
     if (error) throw error
     return (data?.value || {}) as PublicSettings
   })
