@@ -34,8 +34,12 @@ export type Experience = {
   id: string
   participant_id: string
   course_id: string
+  trimester?: number | null
+  participants?: string[]
   title: string
   description: string
+  learning_outcomes?: string
+  activity_reflection?: string
   learning_date: string | null
   status: 'draft' | 'review' | 'published'
   created_at: string

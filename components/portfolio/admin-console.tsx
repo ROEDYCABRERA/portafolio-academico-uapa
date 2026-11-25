@@ -15,6 +15,7 @@ import { STATUS_LABELS } from '@/lib/portfolio/types'
 import { AdminAuth } from './admin-auth'
 import { ParticipantWorkspace } from './participant-workspace'
 import { CurriculumTotalsEditor } from './curriculum-totals-editor'
+import { LearningRecordsManager } from './learning-records-manager'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -79,20 +80,21 @@ export function AdminConsole() { return <AuthGate /> }
 function AdminDashboard({ userEmail }: { userEmail: string }) {
   const [activeTab, setActiveTab] = useState('resumen')
   const { data, error, isLoading, mutate } = useSWR('portfolio-admin-data', async () => {
-    const [participantResult, courseResult, experienceResult, evidenceResult, reflectionResult, settingResult] = await Promise.all([
+    const [participantResult, courseResult, experienceResult, evidenceResult, relationResult, reflectionResult, settingResult] = await Promise.all([
       supabase.rpc('portfolio_admin_participants'),
       supabase.from('portfolio_courses').select('*').order('trimester').order('course_number'),
       supabase.from('portfolio_experiences').select('*').order('created_at', { ascending: false }),
       supabase.from('portfolio_evidence').select('*').order('created_at', { ascending: false }),
+      supabase.from('portfolio_experience_participants').select('experience_id,participant_id'),
       supabase.from('portfolio_reflections').select('*').order('created_at', { ascending: false }),
       supabase.from('portfolio_settings').select('*'),
     ])
-    const firstError = participantResult.error || courseResult.error || experienceResult.error || evidenceResult.error || reflectionResult.error || settingResult.error
+    const firstError = participantResult.error || courseResult.error || experienceResult.error || evidenceResult.error || relationResult.error || reflectionResult.error || settingResult.error
     if (firstError) throw firstError
     return {
       participants: (participantResult.data || []) as Participant[],
       courses: (courseResult.data || []) as Course[],
-      experiences: (experienceResult.data || []) as Experience[],
+      experiences: ((experienceResult.data || []) as Experience[]).map((experience) => ({ ...experience, participants: (relationResult.data || []).filter((relation) => relation.experience_id === experience.id).map((relation) => relation.participant_id) })),
       evidence: (evidenceResult.data || []) as Evidence[],
       reflections: (reflectionResult.data || []) as Reflection[],
       settings: (settingResult.data || []) as Array<{ key: string; value: Record<string, string> }>,
@@ -129,7 +131,7 @@ function AdminDashboard({ userEmail }: { userEmail: string }) {
 
         {activeTab === 'pensum' && <section className="space-y-7"><SectionTitle eyebrow="Ruta curricular" title="Asignaturas y avance." description="Administra las asignaturas, los datos oficiales y los totales declarados del programa y cada trimestre." /><CurriculumTotalsEditor courses={data.courses} value={data.settings.find((setting)=>setting.key==='curriculum')?.value||{}} onSave={async(value)=>{const {error}=await supabase.from('portfolio_settings').upsert({key:'curriculum',value});if(error){toast.error('No se pudieron guardar los totales.');return}toast.success('Totales curriculares guardados.');await refresh()}} /><div className="grid gap-4 lg:grid-cols-2">{data.courses.map((course)=><CourseEditor key={course.id} course={course} onSave={async (values)=>{const parsed=courseSchema.safeParse(values);if(!parsed.success){toast.error('Revisa los datos de la asignatura.');return}const {credits,hours_theoretical,hours_practical,hours_research_virtual,hours_independent,...courseValues}=parsed.data;const title=courseValues.title.trim();const isPlaceholder=course.is_placeholder&&title===course.title;const toNumber=(value:string)=>value===''?null:Number(value);const {error}=await supabase.from('portfolio_courses').update({...courseValues,course_code:courseValues.course_code.trim()||null,credits:toNumber(credits),hours_theoretical:toNumber(hours_theoretical),hours_practical:toNumber(hours_practical),hours_research_virtual:toNumber(hours_research_virtual),hours_independent:toNumber(hours_independent),is_placeholder:isPlaceholder}).eq('id',course.id);if(error){toast.error('No se pudo guardar la asignatura.');return}toast.success('Pénsum actualizado.');await refresh()}} />)}</div></section>}
 
-        {activeTab === 'experiencias' && <section className="space-y-7"><SectionTitle eyebrow="Producciones académicas" title="Experiencias de aprendizaje." description="Registra trabajos, revisa borradores y comparte las evidencias que el equipo autorice para el espacio público." /><ExperienceForm participants={data.participants} courses={data.courses} onCreated={refresh} /><div className="space-y-3">{data.experiences.length===0&&<EmptyCard text="Todavía no se han registrado experiencias." />}{data.experiences.map((experience)=><ExperienceRow key={experience.id} experience={experience} participant={data.participants.find((item)=>item.id===experience.participant_id)} course={data.courses.find((item)=>item.id===experience.course_id)} evidence={data.evidence.filter((item)=>item.experience_id===experience.id)} onStatus={async(status)=>{const {error}=await supabase.from('portfolio_experiences').update({status}).eq('id',experience.id);if(error)toast.error('No se pudo cambiar el estado.');else{toast.success(`Experiencia ${STATUS_LABELS[status].toLowerCase()}.`);await refresh()}}} onDelete={()=>deleteRecord('portfolio_experiences',experience.id)} onUpload={async(file,title)=>{const safeName=file.name.replace(/[^\p{L}\p{N}._-]/gu,'-').slice(-100);const path=`${experience.participant_id}/${crypto.randomUUID()}-${safeName}`;const {error:uploadError}=await supabase.storage.from('portfolio-evidence').upload(path,file,{contentType:file.type,upsert:false});if(uploadError){toast.error('No se pudo subir el archivo. Revisa el tipo, el tamaño (máximo 10 MB) y los permisos.');return}const {error}=await supabase.from('portfolio_evidence').insert({experience_id:experience.id,title,storage_path:path,mime_type:file.type,file_size:file.size,status:'draft'});if(error){await supabase.storage.from('portfolio-evidence').remove([path]);toast.error('No se pudo registrar el archivo.');return}toast.success('Evidencia adjunta como borrador.');await refresh()}} />)}</div></section>}
+        {activeTab === 'experiencias' && <section className="space-y-7"><SectionTitle eyebrow="Producciones académicas" title="Experiencias y evidencias." description="Registra aprendizajes por asignatura, vincula a las personas participantes y administra evidencias desde almacenamiento privado." /><LearningRecordsManager participants={data.participants} courses={data.courses} experiences={data.experiences} evidence={data.evidence} onChanged={refresh} /></section>}
 
         {activeTab === 'reflexiones' && <section className="space-y-7"><SectionTitle eyebrow="Pensamiento crítico" title="Reflexiones individuales y grupales." description="Registra aportes del equipo. La reflexión final compartida se muestra en el portafolio cuando se publica." /><ReflectionForm participants={data.participants} courses={data.courses} onCreated={refresh} /><div className="space-y-3">{data.reflections.length===0&&<EmptyCard text="Aún no hay reflexiones registradas." />}{data.reflections.map((reflection)=><ReflectionRow key={reflection.id} reflection={reflection} participant={data.participants.find((item)=>item.id===reflection.participant_id)} course={data.courses.find((item)=>item.id===reflection.course_id)} onStatus={async(status)=>{const {error}=await supabase.from('portfolio_reflections').update({status}).eq('id',reflection.id);if(error)toast.error('No se pudo actualizar la reflexión.');else{toast.success('Reflexión actualizada.');await refresh()}}} onDelete={()=>deleteRecord('portfolio_reflections',reflection.id)} />)}</div></section>}
 
