@@ -22,11 +22,13 @@ export function AdminAuth() {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    const normalizedEmail = String(formData.get('email') ?? email).trim().toLowerCase()
+    const submittedPassword = String(formData.get('password') ?? password)
     setBusy(true)
     setMessage('')
-    const normalizedEmail = email.trim().toLowerCase()
 
-    if (mode !== 'recovery' && password.length < 8) {
+    if (mode !== 'recovery' && submittedPassword.length < 8) {
       setMessage('Usa una contraseña de al menos 8 caracteres.')
       setBusy(false)
       return
@@ -42,14 +44,14 @@ export function AdminAuth() {
     } else if (mode === 'signup') {
       const { error } = await supabase.auth.signUp({
         email: normalizedEmail,
-        password,
+        password: submittedPassword,
         options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
       })
       setMessage(error
         ? 'No se pudo crear la cuenta. Revisa el correo e intenta de nuevo.'
         : 'Te enviamos un correo para confirmar tu cuenta. El rol se asigna solo después de verificar el correo.')
     } else {
-      const { error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password })
+      const { error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password: submittedPassword })
       setMessage(error
         ? 'No se pudo iniciar sesión. Verifica tus datos y que el correo esté confirmado.'
         : 'Sesión iniciada. Cargando tu espacio…')
@@ -74,14 +76,17 @@ export function AdminAuth() {
             <p className="mt-2 text-sm text-blue-100/75">Gestión del Portafolio Académico Digital UAPA</p>
           </div>
           <CardContent className="p-7">
-            <form onSubmit={onSubmit} className="flex flex-col gap-5">
+            <form onSubmit={onSubmit} autoComplete="on" aria-busy={busy} className="flex flex-col gap-5">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="admin-email">Correo electrónico</Label>
                 <div className="relative">
                   <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                   <Input
                     id="admin-email"
-                    autoComplete="email"
+                    name="email"
+                    autoComplete={mode === 'login' ? 'username' : 'email'}
+                    autoCapitalize="none"
+                    spellCheck={false}
                     type="email"
                     required
                     value={email}
@@ -98,6 +103,7 @@ export function AdminAuth() {
                     <LockKeyhole size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <Input
                       id="admin-password"
+                      name="password"
                       autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
                       type={showPassword ? 'text' : 'password'}
                       required
