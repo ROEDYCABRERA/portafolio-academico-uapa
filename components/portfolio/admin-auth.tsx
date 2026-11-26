@@ -25,6 +25,8 @@ export function AdminAuth() {
     const formData = new FormData(event.currentTarget)
     const normalizedEmail = String(formData.get('email') ?? email).trim().toLowerCase()
     const submittedPassword = String(formData.get('password') ?? password)
+    setEmail(normalizedEmail)
+    if (mode !== 'recovery') setPassword(submittedPassword)
     setBusy(true)
     setMessage('')
 
