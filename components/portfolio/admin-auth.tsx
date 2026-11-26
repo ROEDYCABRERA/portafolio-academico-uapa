@@ -11,10 +11,19 @@ import { Label } from '@/components/ui/label'
 
 type AuthMode = 'login' | 'signup' | 'recovery'
 
+let rememberedAdminAuth: { email: string; password: string } | null = null
+
+function rememberAdminAuthForm() {
+  rememberedAdminAuth = {
+    email: document.querySelector<HTMLInputElement>('#admin-email')?.value ?? '',
+    password: document.querySelector<HTMLInputElement>('#admin-password')?.value ?? '',
+  }
+}
+
 export function AdminAuth() {
   const [mode, setMode] = useState<AuthMode>('login')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState(() => rememberedAdminAuth?.email ?? '')
+  const [password, setPassword] = useState(() => rememberedAdminAuth?.password ?? '')
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -25,6 +34,8 @@ export function AdminAuth() {
     const formData = new FormData(event.currentTarget)
     const normalizedEmail = String(formData.get('email') ?? email).trim().toLowerCase()
     const submittedPassword = String(formData.get('password') ?? password)
+    const submittedValues = { email: normalizedEmail, password: mode === 'recovery' ? '' : submittedPassword }
+    rememberedAdminAuth = submittedValues
     setEmail(normalizedEmail)
     if (mode !== 'recovery') setPassword(submittedPassword)
     setBusy(true)
@@ -44,16 +55,20 @@ export function AdminAuth() {
         ? 'No se pudo enviar el correo de recuperación. Inténtalo de nuevo más tarde.'
         : 'Si existe una cuenta con ese correo, recibirás un enlace para restablecer la contraseña.')
     } else if (mode === 'signup') {
+      rememberedAdminAuth = null
       const { error } = await supabase.auth.signUp({
         email: normalizedEmail,
         password: submittedPassword,
         options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
       })
+      if (error) rememberedAdminAuth = submittedValues
       setMessage(error
         ? 'No se pudo crear la cuenta. Revisa el correo e intenta de nuevo.'
         : 'Te enviamos un correo para confirmar tu cuenta. El rol se asigna solo después de verificar el correo.')
     } else {
+      rememberedAdminAuth = null
       const { error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password: submittedPassword })
+      if (error) rememberedAdminAuth = submittedValues
       setMessage(error
         ? 'No se pudo iniciar sesión. Verifica tus datos y que el correo esté confirmado.'
         : 'Sesión iniciada. Cargando tu espacio…')
@@ -68,7 +83,7 @@ export function AdminAuth() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[radial-gradient(ellipse_at_top,#eaf2ff_0%,#f8fafc_50%,#f1f5f9_100%)] px-5 py-12">
       <div className="w-full max-w-md">
-        <Link href="/" className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-blue-800">
+        <Link href="/" onClick={rememberAdminAuthForm} className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-blue-800">
           <ArrowLeft size={16} />Volver al portafolio
         </Link>
         <Card className="overflow-hidden border-slate-200/80 bg-white shadow-xl shadow-slate-900/5">
@@ -144,7 +159,7 @@ export function AdminAuth() {
               {mode === 'login' ? '¿Primera vez aquí?' : '¿Ya tienes acceso?'}{' '}
               <button
                 type="button"
-                onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setMessage(''); setPassword('') }}
+                onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setMessage(''); setPassword(''); if (rememberedAdminAuth) rememberedAdminAuth = { ...rememberedAdminAuth, password: '' } }}
                 className="font-semibold text-blue-700 underline-offset-4 hover:underline"
               >
                 {mode === 'login' ? 'Crear una cuenta' : 'Iniciar sesión'}
