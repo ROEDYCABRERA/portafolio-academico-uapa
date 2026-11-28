@@ -11,26 +11,17 @@ import { Label } from '@/components/ui/label'
 
 type AuthMode = 'login' | 'signup' | 'recovery'
 
-let rememberedAdminAuth: { email: string; password: string } | null = null
-
-function rememberAdminAuthForm() {
-  rememberedAdminAuth = {
-    email: document.querySelector<HTMLInputElement>('#admin-email')?.value ?? '',
-    password: document.querySelector<HTMLInputElement>('#admin-password')?.value ?? '',
-  }
-}
-
 export function AdminAuth() {
   const [mode, setMode] = useState<AuthMode>('login')
-  const [defaultEmail, setDefaultEmail] = useState(() => rememberedAdminAuth?.email ?? '')
-  const [defaultPassword, setDefaultPassword] = useState(() => rememberedAdminAuth?.password ?? '')
+  const [defaultEmail, setDefaultEmail] = useState('')
+  const [defaultPassword, setDefaultPassword] = useState('')
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
   const supabase = createClient()
 
-  /** Read values directly from the DOM — works with autofill in every browser. */
+  /** Read values directly from the DOM. */
   function readFormValues() {
     const form = formRef.current
     if (!form) return { email: '', password: '' }
@@ -44,8 +35,6 @@ export function AdminAuth() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const { email: normalizedEmail, password: submittedPassword } = readFormValues()
-    const submittedValues = { email: normalizedEmail, password: mode === 'recovery' ? '' : submittedPassword }
-    rememberedAdminAuth = submittedValues
     setDefaultEmail(normalizedEmail)
     if (mode !== 'recovery') setDefaultPassword(submittedPassword)
     setBusy(true)
@@ -65,20 +54,16 @@ export function AdminAuth() {
         ? 'No se pudo enviar el correo de recuperación. Inténtalo de nuevo más tarde.'
         : 'Si existe una cuenta con ese correo, recibirás un enlace para restablecer la contraseña.')
     } else if (mode === 'signup') {
-      rememberedAdminAuth = null
       const { error } = await supabase.auth.signUp({
         email: normalizedEmail,
         password: submittedPassword,
         options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
       })
-      if (error) rememberedAdminAuth = submittedValues
       setMessage(error
         ? 'No se pudo crear la cuenta. Revisa el correo e intenta de nuevo.'
         : 'Te enviamos un correo para confirmar tu cuenta. El rol se asigna solo después de verificar el correo.')
     } else {
-      rememberedAdminAuth = null
       const { error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password: submittedPassword })
-      if (error) rememberedAdminAuth = submittedValues
       setMessage(error
         ? 'No se pudo iniciar sesión. Verifica tus datos y que el correo esté confirmado.'
         : 'Sesión iniciada. Cargando tu espacio…')
@@ -93,7 +78,7 @@ export function AdminAuth() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[radial-gradient(ellipse_at_top,#eaf2ff_0%,#f8fafc_50%,#f1f5f9_100%)] px-5 py-12">
       <div className="w-full max-w-md">
-        <Link href="/" onClick={rememberAdminAuthForm} className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-blue-800">
+        <Link href="/" className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-blue-800">
           <ArrowLeft size={16} />Volver al portafolio
         </Link>
         <Card className="overflow-hidden border-slate-200/80 bg-white shadow-xl shadow-slate-900/5">
@@ -103,7 +88,7 @@ export function AdminAuth() {
             <p className="mt-2 text-sm text-blue-100/75">Gestión del Portafolio Académico Digital UAPA</p>
           </div>
           <CardContent className="p-7">
-              <form ref={formRef} onSubmit={onSubmit} autoComplete="on" aria-busy={busy} className="flex flex-col gap-5">
+              <form ref={formRef} onSubmit={onSubmit} autoComplete="off" aria-busy={busy} className="flex flex-col gap-5">
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="admin-email">Correo electrónico</Label>
                   <div className="relative">
@@ -112,7 +97,7 @@ export function AdminAuth() {
                       key={`email-${mode}`}
                       id="admin-email"
                       name="email"
-                      autoComplete={mode === 'login' ? 'username' : 'email'}
+                      autoComplete="off"
                       autoCapitalize="none"
                       spellCheck={false}
                       type="email"
@@ -132,7 +117,7 @@ export function AdminAuth() {
                         key={`password-${mode}`}
                         id="admin-password"
                         name="password"
-                        autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+                        autoComplete="off"
                         type={showPassword ? 'text' : 'password'}
                         required
                         minLength={8}
@@ -169,7 +154,7 @@ export function AdminAuth() {
                 {mode === 'login' ? '¿Primera vez aquí?' : '¿Ya tienes acceso?'}{' '}
                 <button
                   type="button"
-                  onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setMessage(''); setDefaultPassword(''); if (rememberedAdminAuth) rememberedAdminAuth = { ...rememberedAdminAuth, password: '' } }}
+                  onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setMessage(''); setDefaultPassword('') }}
                   className="font-semibold text-blue-700 underline-offset-4 hover:underline"
                 >
                   {mode === 'login' ? 'Crear una cuenta' : 'Iniciar sesión'}
