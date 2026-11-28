@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useState } from 'react'
+import { FormEvent, useRef, useState } from 'react'
 import { ArrowLeft, Eye, EyeOff, GraduationCap, LockKeyhole, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -22,22 +22,32 @@ function rememberAdminAuthForm() {
 
 export function AdminAuth() {
   const [mode, setMode] = useState<AuthMode>('login')
-  const [email, setEmail] = useState(() => rememberedAdminAuth?.email ?? '')
-  const [password, setPassword] = useState(() => rememberedAdminAuth?.password ?? '')
+  const [defaultEmail, setDefaultEmail] = useState(() => rememberedAdminAuth?.email ?? '')
+  const [defaultPassword, setDefaultPassword] = useState(() => rememberedAdminAuth?.password ?? '')
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
   const supabase = createClient()
+
+  /** Read values directly from the DOM — works with autofill in every browser. */
+  function readFormValues() {
+    const form = formRef.current
+    if (!form) return { email: '', password: '' }
+    const formData = new FormData(form)
+    return {
+      email: String(formData.get('email') ?? '').trim().toLowerCase(),
+      password: String(formData.get('password') ?? ''),
+    }
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const formData = new FormData(event.currentTarget)
-    const normalizedEmail = String(formData.get('email') ?? email).trim().toLowerCase()
-    const submittedPassword = String(formData.get('password') ?? password)
+    const { email: normalizedEmail, password: submittedPassword } = readFormValues()
     const submittedValues = { email: normalizedEmail, password: mode === 'recovery' ? '' : submittedPassword }
     rememberedAdminAuth = submittedValues
-    setEmail(normalizedEmail)
-    if (mode !== 'recovery') setPassword(submittedPassword)
+    setDefaultEmail(normalizedEmail)
+    if (mode !== 'recovery') setDefaultPassword(submittedPassword)
     setBusy(true)
     setMessage('')
 
@@ -93,81 +103,81 @@ export function AdminAuth() {
             <p className="mt-2 text-sm text-blue-100/75">Gestión del Portafolio Académico Digital UAPA</p>
           </div>
           <CardContent className="p-7">
-            <form onSubmit={onSubmit} autoComplete="on" aria-busy={busy} className="flex flex-col gap-5">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="admin-email">Correo electrónico</Label>
-                <div className="relative">
-                  <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <Input
-                    id="admin-email"
-                    name="email"
-                    autoComplete={mode === 'login' ? 'username' : 'email'}
-                    autoCapitalize="none"
-                    spellCheck={false}
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    placeholder="nombre@correo.com"
-                    className="pl-9"
-                  />
-                </div>
-              </div>
-              {mode !== 'recovery' && (
+              <form ref={formRef} onSubmit={onSubmit} autoComplete="on" aria-busy={busy} className="flex flex-col gap-5">
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="admin-password">Contraseña</Label>
+                  <Label htmlFor="admin-email">Correo electrónico</Label>
                   <div className="relative">
-                    <LockKeyhole size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <Input
-                      id="admin-password"
-                      name="password"
-                      autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-                      type={showPassword ? 'text' : 'password'}
+                      key={`email-${mode}`}
+                      id="admin-email"
+                      name="email"
+                      autoComplete={mode === 'login' ? 'username' : 'email'}
+                      autoCapitalize="none"
+                      spellCheck={false}
+                      type="email"
                       required
-                      minLength={8}
-                      value={password}
-                      onChange={(event) => setPassword(event.target.value)}
-                      placeholder="Al menos 8 caracteres"
-                      className="pl-9 pr-11"
+                      defaultValue={defaultEmail}
+                      placeholder="nombre@correo.com"
+                      className="pl-9"
                     />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((show) => !show)}
-                      aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
-                    >
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
                   </div>
                 </div>
-              )}
-              {mode === 'login' && (
+                {mode !== 'recovery' && (
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="admin-password">Contraseña</Label>
+                    <div className="relative">
+                      <LockKeyhole size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <Input
+                        key={`password-${mode}`}
+                        id="admin-password"
+                        name="password"
+                        autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        minLength={8}
+                        defaultValue={defaultPassword}
+                        placeholder="Al menos 8 caracteres"
+                        className="pl-9 pr-11"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((show) => !show)}
+                        aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
+                      >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {mode === 'login' && (
+                  <button
+                    type="button"
+                    onClick={() => { setMode('recovery'); setMessage('') }}
+                    className="self-end text-sm font-medium text-blue-700 underline-offset-4 hover:underline"
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </button>
+                )}
+                <Button type="submit" disabled={busy} className="h-11 w-full rounded-xl bg-[#0B2545] hover:bg-[#143B68]">
+                  {busy ? 'Procesando…' : mode === 'login' ? 'Iniciar sesión' : mode === 'signup' ? 'Crear cuenta' : 'Enviar enlace de recuperación'}
+                </Button>
+                {message && <p role="status" aria-live="polite" className="rounded-xl bg-blue-50 p-3 text-sm leading-6 text-blue-900">{message}</p>}
+              </form>
+              <p className="mt-6 text-center text-sm text-slate-600">
+                {mode === 'login' ? '¿Primera vez aquí?' : '¿Ya tienes acceso?'}{' '}
                 <button
                   type="button"
-                  onClick={() => { setMode('recovery'); setMessage('') }}
-                  className="self-end text-sm font-medium text-blue-700 underline-offset-4 hover:underline"
+                  onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setMessage(''); setDefaultPassword(''); if (rememberedAdminAuth) rememberedAdminAuth = { ...rememberedAdminAuth, password: '' } }}
+                  className="font-semibold text-blue-700 underline-offset-4 hover:underline"
                 >
-                  ¿Olvidaste tu contraseña?
+                  {mode === 'login' ? 'Crear una cuenta' : 'Iniciar sesión'}
                 </button>
-              )}
-              <Button type="submit" disabled={busy} className="h-11 w-full rounded-xl bg-[#0B2545] hover:bg-[#143B68]">
-                {busy ? 'Procesando…' : mode === 'login' ? 'Iniciar sesión' : mode === 'signup' ? 'Crear cuenta' : 'Enviar enlace de recuperación'}
-              </Button>
-              {message && <p role="status" aria-live="polite" className="rounded-xl bg-blue-50 p-3 text-sm leading-6 text-blue-900">{message}</p>}
-            </form>
-            <p className="mt-6 text-center text-sm text-slate-600">
-              {mode === 'login' ? '¿Primera vez aquí?' : '¿Ya tienes acceso?'}{' '}
-              <button
-                type="button"
-                onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setMessage(''); setPassword(''); if (rememberedAdminAuth) rememberedAdminAuth = { ...rememberedAdminAuth, password: '' } }}
-                className="font-semibold text-blue-700 underline-offset-4 hover:underline"
-              >
-                {mode === 'login' ? 'Crear una cuenta' : 'Iniciar sesión'}
-              </button>
-            </p>
-            <p className="mt-4 text-center text-xs leading-5 text-slate-500">
-              El registro no concede privilegios por sí solo. El rol se asigna en el servidor tras confirmar el correo.
-            </p>
+              </p>
+              <p className="mt-4 text-center text-xs leading-5 text-slate-500">
+                El registro no concede privilegios por sí solo. El rol se asigna en el servidor tras confirmar el correo.
+              </p>
           </CardContent>
         </Card>
       </div>
