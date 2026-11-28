@@ -97,7 +97,7 @@ export function AdminAuth() {
           <ArrowLeft size={16} />Volver al portafolio
         </Link>
         <Card className="overflow-hidden border-slate-200/80 bg-white shadow-xl shadow-slate-900/5">
-          <div className="bg-[#2563EB] px-7 py-7 text-white">
+          <div className="bg-[#0B2545] px-7 py-7 text-white">
             <span className="grid size-12 place-items-center rounded-xl bg-white/10"><GraduationCap /></span>
             <h1 className="mt-5 text-2xl font-bold">{title}</h1>
             <p className="mt-2 text-sm text-blue-100/75">Gestión del Portafolio Académico Digital UAPA</p>
@@ -160,7 +160,7 @@ export function AdminAuth() {
                     ¿Olvidaste tu contraseña?
                   </button>
                 )}
-                <Button type="submit" disabled={busy} className="h-11 w-full rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8]">
+                <Button type="submit" disabled={busy} className="h-11 w-full rounded-xl bg-[#0B2545] hover:bg-[#143B68]">
                   {busy ? 'Procesando…' : mode === 'login' ? 'Iniciar sesión' : mode === 'signup' ? 'Crear cuenta' : 'Enviar enlace de recuperación'}
                 </Button>
                 {message && <p role="status" aria-live="polite" className="rounded-xl bg-blue-50 p-3 text-sm leading-6 text-blue-900">{message}</p>}

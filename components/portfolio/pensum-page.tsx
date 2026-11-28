@@ -56,7 +56,7 @@ function MetricCard({ label, abbr, declared, computed, icon: Icon }: {
           <span className="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-bold tracking-wide text-slate-600">{abbr}</span>
         </div>
         <p className="mt-4 text-xs font-medium text-slate-500">{label}</p>
-        <p className="mt-1 text-xl font-bold tracking-tight text-[#2563EB] sm:text-2xl">{declared.toLocaleString('es-DO')}</p>
+        <p className="mt-1 text-xl font-bold tracking-tight text-[#0B2545] sm:text-2xl">{declared.toLocaleString('es-DO')}</p>
         {diff !== 0 && (
           <p className="mt-1 text-[10px] leading-4 text-amber-700">
             Suma individual: {computed.toLocaleString('es-DO')} ({diff > 0 ? '+' : ''}{diff})
@@ -103,7 +103,7 @@ export function PensumPage() {
           <header className="mb-7 flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[.18em] text-blue-700">Ruta curricular</p>
-              <h1 className="mt-2 max-w-3xl font-heading text-2xl font-bold leading-tight tracking-tight text-[#2563EB] sm:text-3xl">
+              <h1 className="mt-2 max-w-3xl font-heading text-2xl font-bold leading-tight tracking-tight text-[#0B2545] sm:text-3xl">
                 Pénsum 2024 · Habilitación Docente en Informática
               </h1>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
@@ -137,7 +137,7 @@ export function PensumPage() {
             <div className="flex-1">
               <Progress value={isLoading ? null : progress} aria-label={`Progreso: ${completedCourses} de ${totalCourses} completadas`} className="h-2" />
             </div>
-            <span className="text-sm font-semibold text-[#2563EB]">
+            <span className="text-sm font-semibold text-[#0B2545]">
               {isLoading ? '—' : `${completedCourses}/${totalCourses} completadas`}
             </span>
           </div>
@@ -162,7 +162,7 @@ export function PensumPage() {
                   onClick={() => setActiveFilter(t)}
                   className={`rounded-xl px-3 py-1.5 text-sm font-medium transition ${
                     activeFilter === t
-                      ? 'bg-[#2563EB] text-white'
+                      ? 'bg-[#0B2545] text-white'
                       : 'border border-slate-200 bg-white text-slate-700 hover:border-blue-200 hover:bg-blue-50'
                   }`}
                 >
@@ -203,7 +203,7 @@ export function PensumPage() {
                             {course.course_code || '—'}
                           </Link>
                         </td>
-                        <td className="px-4 py-4 font-medium text-[#2563EB]">
+                        <td className="px-4 py-4 font-medium text-[#0B2545]">
                           <Link href={`/asignaturas/${(course.course_code || '').toLowerCase()}`} className="hover:text-blue-800">
                             {course.title}
                           </Link>
@@ -213,7 +213,7 @@ export function PensumPage() {
                         <td className="px-4 py-4 text-slate-700">{course.hours_practical ?? '—'}</td>
                         <td className="px-4 py-4 text-slate-700">{course.hours_research_virtual ?? '—'}</td>
                         <td className="px-4 py-4 text-slate-700">{course.hours_independent ?? '—'}</td>
-                        <td className="px-4 py-4 font-semibold text-[#2563EB]">{course.credits ?? '—'}</td>
+                        <td className="px-4 py-4 font-semibold text-[#0B2545]">{course.credits ?? '—'}</td>
                         <td className="px-4 py-4 text-slate-500 text-xs">{course.prerequisite || '—'}</td>
                         <td className="pr-5 py-4">
                           <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${STATUS_COLOR[course.status] ?? 'bg-slate-100 text-slate-700'}`}>
@@ -247,7 +247,7 @@ export function PensumPage() {
                             <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-blue-700">
                               {course.course_code} · {TRIMESTER_LABELS[course.trimester - 1]}
                             </p>
-                            <h3 className="mt-1 font-semibold leading-5 text-[#2563EB]">{course.title}</h3>
+                            <h3 className="mt-1 font-semibold leading-5 text-[#0B2545]">{course.title}</h3>
                           </div>
                           <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${STATUS_COLOR[course.status] ?? 'bg-slate-100 text-slate-700'}`}>
                             {STATUS_LABELS[course.status] || course.status}
@@ -257,7 +257,7 @@ export function PensumPage() {
                           {([['CR', course.credits], ['HT', course.hours_theoretical], ['HP', course.hours_practical], ['HIV', course.hours_research_virtual], ['HI', course.hours_independent]] as [string, number | null][]).map(([label, value]) => (
                             <div key={label} className="rounded-lg bg-slate-50 p-2 text-center">
                               <p className="text-[9px] font-bold uppercase text-slate-400">{label}</p>
-                              <p className="mt-0.5 text-sm font-bold text-[#2563EB]">{value ?? '—'}</p>
+                              <p className="mt-0.5 text-sm font-bold text-[#0B2545]">{value ?? '—'}</p>
                             </div>
                           ))}
                         </div>
@@ -283,7 +283,7 @@ export function PensumPage() {
 
           {/* Per-trimester summaries */}
           <section className="mt-10" aria-label="Resumen por trimestre">
-            <h2 className="mb-4 font-heading text-lg font-bold text-[#2563EB]">Resumen por trimestre</h2>
+            <h2 className="mb-4 font-heading text-lg font-bold text-[#0B2545]">Resumen por trimestre</h2>
             <div className="grid gap-4 lg:grid-cols-2">
               {[1, 2, 3, 4].map((term) => {
                 const declared = DECLARED_TRIMESTERS[String(term)]
@@ -299,7 +299,7 @@ export function PensumPage() {
                   <Card key={term} className="border-slate-200/80 shadow-sm">
                     <CardContent className="p-5">
                       <div className="flex items-baseline justify-between gap-3">
-                        <h3 className="font-semibold text-[#2563EB]">{TRIMESTER_LABELS[term - 1]}</h3>
+                        <h3 className="font-semibold text-[#0B2545]">{TRIMESTER_LABELS[term - 1]}</h3>
                         <span className="text-xs text-slate-500">{termCourses.length} asignaturas</span>
                       </div>
                       <div className="mt-4 grid grid-cols-5 gap-2">
@@ -310,7 +310,7 @@ export function PensumPage() {
                           return (
                             <div key={field} className={`rounded-xl p-3 ${hasDiff ? 'bg-amber-50' : 'bg-slate-50'}`}>
                               <p className="text-[10px] font-semibold uppercase text-slate-500">{field.toUpperCase()}</p>
-                              <p className="mt-1 font-bold text-[#2563EB]">{dec}</p>
+                              <p className="mt-1 font-bold text-[#0B2545]">{dec}</p>
                               {hasDiff && <p className="text-[9px] text-amber-700">Suma: {act}</p>}
                             </div>
                           )
