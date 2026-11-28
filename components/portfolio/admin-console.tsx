@@ -59,8 +59,11 @@ function AuthGate() {
   const { mutate } = useSWRConfig()
   const { data: user, isLoading: checking } = useSWR('portfolio-auth', async () => {
     const { data, error } = await supabase.auth.getUser()
-    if (error) throw error
-    return data.user ? { id: data.user.id, email: data.user.email } : null
+    if (error || !data.user) return null
+    return { id: data.user.id, email: data.user.email }
+  }, {
+    revalidateOnFocus: false,
+    shouldRetryOnError: false,
   })
 
   useEffect(() => {
