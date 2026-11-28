@@ -99,15 +99,15 @@ export function PortfolioSidebar({ completedCourses, totalCourses, loading }: Po
     <>
       <div className="sticky top-0 z-40 flex h-[68px] items-center justify-between border-b border-slate-200 bg-white px-4 md:hidden">
         <Link href="/" aria-label="Portafolio UAPA, inicio" className="flex items-center gap-3">
-          <span className="grid size-10 place-items-center rounded-xl bg-[#0B2545] text-white"><GraduationCap aria-hidden="true" size={20} /></span>
-          <span><span className="block text-xs font-bold tracking-wide text-[#0B2545]">PORTAFOLIO UAPA</span><span className="block text-[10px] text-slate-500">Habilitación Docente</span></span>
+          <span className="grid size-10 place-items-center rounded-xl bg-[#2563EB] text-white"><GraduationCap aria-hidden="true" size={20} /></span>
+          <span><span className="block text-xs font-bold tracking-wide text-[#2563EB]">PORTAFOLIO UAPA</span><span className="block text-[10px] text-slate-500">Habilitación Docente</span></span>
         </Link>
-        <button ref={mobileTriggerRef} type="button" aria-label={open ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={open} aria-controls="portfolio-mobile-navigation" onClick={() => setOpen(!open)} className="grid size-10 place-items-center rounded-xl border border-slate-200 text-[#0B2545] transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+        <button ref={mobileTriggerRef} type="button" aria-label={open ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={open} aria-controls="portfolio-mobile-navigation" onClick={() => setOpen(!open)} className="grid size-10 place-items-center rounded-xl border border-slate-200 text-[#2563EB] transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
           {open ? <X aria-hidden="true" size={20} /> : <Menu aria-hidden="true" size={20} />}
         </button>
       </div>
 
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[264px] flex-col bg-[#0B2545] px-4 py-5 text-white md:flex">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[264px] flex-col bg-[#2563EB] px-4 py-5 text-white md:flex">
         <Link href="/" aria-label="Portafolio UAPA, inicio" className="flex items-center gap-3 px-2">
           <span className="grid size-11 place-items-center rounded-xl bg-white/10"><GraduationCap aria-hidden="true" size={22} /></span>
           <span><span className="block text-sm font-bold tracking-wide">PORTAFOLIO UAPA</span><span className="mt-0.5 block text-[11px] leading-4 text-blue-100/65">Habilitación Docente en Informática</span></span>
@@ -123,7 +123,7 @@ export function PortfolioSidebar({ completedCourses, totalCourses, loading }: Po
 
       {open && <div className="fixed inset-0 z-50 md:hidden">
         <button type="button" aria-label="Cerrar menú" onClick={() => setOpen(false)} className="absolute inset-0 bg-slate-950/45" />
-        <aside ref={drawerRef} id="portfolio-mobile-navigation" role="dialog" aria-modal="true" aria-label="Menú de navegación" className="relative flex h-full w-[min(86vw,320px)] flex-col bg-[#0B2545] px-4 py-5 text-white shadow-2xl">
+        <aside ref={drawerRef} id="portfolio-mobile-navigation" role="dialog" aria-modal="true" aria-label="Menú de navegación" className="relative flex h-full w-[min(86vw,320px)] flex-col bg-[#2563EB] px-4 py-5 text-white shadow-2xl">
           <div className="flex items-center justify-between px-2">
             <Link href="/" aria-label="Portafolio UAPA, inicio" onClick={() => setOpen(false)} className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-xl bg-white/10"><GraduationCap aria-hidden="true" size={21} /></span><span><span className="block text-sm font-bold">PORTAFOLIO UAPA</span><span className="text-[10px] text-blue-100/65">Habilitación Docente</span></span></Link>
             <button type="button" aria-label="Cerrar menú" onClick={() => setOpen(false)} className="grid size-9 place-items-center rounded-lg text-blue-100 hover:bg-white/10"><X aria-hidden="true" size={19} /></button>

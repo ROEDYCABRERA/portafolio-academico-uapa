@@ -47,7 +47,7 @@ function EmptySection({ title, copy }: { title: string; copy: string }) {
     <Card className="border-dashed">
       <CardContent className="p-9 text-center">
         <BookOpen aria-hidden="true" className="mx-auto text-slate-400" />
-        <h2 className="mt-3 font-semibold text-[#0B2545]">{title}</h2>
+        <h2 className="mt-3 font-semibold text-[#2563EB]">{title}</h2>
         <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-slate-500">{copy}</p>
       </CardContent>
     </Card>
@@ -167,7 +167,7 @@ export function CourseDetailByCode({ code }: { code: string }) {
   if (!course) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold text-[#0B2545]">Asignatura no encontrada</h1>
+        <h1 className="text-2xl font-bold text-[#2563EB]">Asignatura no encontrada</h1>
         <p className="mt-3 text-sm text-slate-600">No se encontró ninguna asignatura con el código «{code}».</p>
         <Link href="/pensum" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-blue-800">
           <ArrowLeft aria-hidden="true" size={16} />Volver al pénsum
@@ -187,7 +187,7 @@ export function CourseDetailByCode({ code }: { code: string }) {
       </Link>
 
       {/* Header card */}
-      <header className="mt-5 rounded-3xl bg-[#0B2545] p-6 text-white shadow-sm sm:p-9">
+      <header className="mt-5 rounded-3xl bg-[#2563EB] p-6 text-white shadow-sm sm:p-9">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-3xl">
             <p className="text-xs font-bold uppercase tracking-[.16em] text-blue-200">
@@ -268,7 +268,7 @@ export function CourseDetailByCode({ code }: { code: string }) {
                 }
               }}
               className={`flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 ${
-                activeTab === id ? 'bg-[#0B2545] text-white' : 'text-slate-600 hover:bg-slate-100'
+                activeTab === id ? 'bg-[#2563EB] text-white' : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
               <Icon aria-hidden="true" size={16} />
@@ -294,7 +294,7 @@ export function CourseDetailByCode({ code }: { code: string }) {
                     <ClipboardList aria-hidden="true" size={19} />
                   </span>
                   <div>
-                    <h2 className="font-semibold text-[#0B2545]">Prerrequisito</h2>
+                    <h2 className="font-semibold text-[#2563EB]">Prerrequisito</h2>
                     <p className="mt-1 text-sm leading-6 text-slate-600">{course.prerequisite || 'No especificado'}</p>
                   </div>
                 </CardContent>
@@ -305,7 +305,7 @@ export function CourseDetailByCode({ code }: { code: string }) {
                     <UserRound aria-hidden="true" size={19} />
                   </span>
                   <div>
-                    <h2 className="font-semibold text-[#0B2545]">Facilitador/a</h2>
+                    <h2 className="font-semibold text-[#2563EB]">Facilitador/a</h2>
                     <p className="mt-1 text-sm leading-6 text-slate-600">{course.facilitator || 'Pendiente de asignación'}</p>
                   </div>
                 </CardContent>
@@ -313,7 +313,7 @@ export function CourseDetailByCode({ code }: { code: string }) {
 
               <Card className="border-slate-200/80 md:col-span-2">
                 <CardContent className="p-5">
-                  <h2 className="font-semibold text-[#0B2545]">Propósito de aprendizaje</h2>
+                  <h2 className="font-semibold text-[#2563EB]">Propósito de aprendizaje</h2>
                   <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-600">
                     {course.description || 'La descripción específica de la asignatura será incorporada por el equipo académico.'}
                   </p>
@@ -323,7 +323,7 @@ export function CourseDetailByCode({ code }: { code: string }) {
               {/* Academic information */}
               <Card className="border-slate-200/80 md:col-span-2">
                 <CardContent className="p-5">
-                  <h2 className="font-semibold text-[#0B2545]">Información académica</h2>
+                  <h2 className="font-semibold text-[#2563EB]">Información académica</h2>
                   <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
                     {([
                       ['Créditos (CR)',   course.credits],
@@ -334,7 +334,7 @@ export function CourseDetailByCode({ code }: { code: string }) {
                     ] as [string, number | null][]).map(([label, value]) => (
                       <div key={label} className="rounded-xl bg-slate-50 p-3">
                         <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{label}</p>
-                        <p className="mt-1 text-lg font-bold text-[#0B2545]">{value ?? '—'}</p>
+                        <p className="mt-1 text-lg font-bold text-[#2563EB]">{value ?? '—'}</p>
                       </div>
                     ))}
                   </div>
@@ -347,7 +347,7 @@ export function CourseDetailByCode({ code }: { code: string }) {
                     ].map(({ label, value }) => (
                       <div key={label}>
                         <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</span>
-                        <p className="mt-1 font-medium text-[#0B2545]">{value}</p>
+                        <p className="mt-1 font-medium text-[#2563EB]">{value}</p>
                       </div>
                     ))}
                   </div>
@@ -363,7 +363,7 @@ export function CourseDetailByCode({ code }: { code: string }) {
                 <Card key={exp.id} className="border-slate-200/80">
                   <CardContent className="p-5">
                     <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Experiencia de aprendizaje</p>
-                    <h2 className="mt-2 font-semibold text-[#0B2545]">{exp.title}</h2>
+                    <h2 className="mt-2 font-semibold text-[#2563EB]">{exp.title}</h2>
                     <p className="mt-2 whitespace-pre-line text-sm leading-6 text-slate-600">{exp.description}</p>
                     {exp.learning_date && (
                       <p className="mt-3 text-xs text-slate-500">
@@ -392,7 +392,7 @@ export function CourseDetailByCode({ code }: { code: string }) {
                         <FileCheck2 aria-hidden="true" size={19} />
                       </span>
                       <div className="min-w-0">
-                        <h2 className="font-semibold text-[#0B2545]">{item.title}</h2>
+                        <h2 className="font-semibold text-[#2563EB]">{item.title}</h2>
                         <p className="mt-1 text-xs text-slate-500">{item.description || 'Evidencia académica publicada'}</p>
                         {links[item.id] ? (
                           <a
@@ -429,7 +429,7 @@ export function CourseDetailByCode({ code }: { code: string }) {
                       <MessageSquareQuote aria-hidden="true" size={15} />
                       Reflexión personal publicada
                     </div>
-                    <h2 className="mt-3 font-heading text-lg font-bold text-[#0B2545]">
+                    <h2 className="mt-3 font-heading text-lg font-bold text-[#2563EB]">
                       {ref.title || 'Reflexión de aprendizaje'}
                     </h2>
                     {ref.content && <p className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-600">{ref.content}</p>}
@@ -458,7 +458,7 @@ export function CourseDetailByCode({ code }: { code: string }) {
                       <MessageSquareQuote aria-hidden="true" size={15} />
                       Reflexión personal publicada
                     </div>
-                    <h2 className="mt-3 font-heading text-lg font-bold text-[#0B2545]">{ref.title}</h2>
+                    <h2 className="mt-3 font-heading text-lg font-bold text-[#2563EB]">{ref.title}</h2>
                     <p className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-600">{ref.body}</p>
                   </CardContent>
                 </Card>
@@ -492,7 +492,7 @@ export function CourseDetailByCode({ code }: { code: string }) {
               <span className="flex items-center gap-1 text-xs text-slate-500">
                 <ChevronLeft aria-hidden="true" size={14} /> Anterior
               </span>
-              <span className="font-semibold text-[#0B2545]">{prevMeta.code}</span>
+              <span className="font-semibold text-[#2563EB]">{prevMeta.code}</span>
               <span className="line-clamp-1 text-xs text-slate-500">{prevMeta.name}</span>
             </Link>
           ) : <span />}
@@ -505,7 +505,7 @@ export function CourseDetailByCode({ code }: { code: string }) {
               <span className="flex items-center gap-1 text-xs text-slate-500">
                 Siguiente <ChevronRight aria-hidden="true" size={14} />
               </span>
-              <span className="font-semibold text-[#0B2545]">{nextMeta.code}</span>
+              <span className="font-semibold text-[#2563EB]">{nextMeta.code}</span>
               <span className="line-clamp-1 text-right text-xs text-slate-500">{nextMeta.name}</span>
             </Link>
           ) : <span />}

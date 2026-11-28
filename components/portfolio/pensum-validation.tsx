@@ -183,7 +183,7 @@ export function PensumValidationModule({
       {/* Summary bar */}
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-sm font-semibold text-[#0B2545]">Validación del pénsum</span>
+          <span className="text-sm font-semibold text-[#2563EB]">Validación del pénsum</span>
           {errors   > 0 && <Badge variant="destructive">{errors} error{errors !== 1 ? 'es' : ''}</Badge>}
           {warnings > 0 && <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">{warnings} advertencia{warnings !== 1 ? 's' : ''}</Badge>}
           {infos    > 0 && <Badge variant="secondary">{infos} info</Badge>}
@@ -212,7 +212,7 @@ export function PensumValidationModule({
                 <li key={issue.scope} className="flex items-start gap-3 rounded-xl border border-amber-200 bg-white p-4">
                   <Icon aria-hidden="true" size={18} className="mt-0.5 shrink-0 text-amber-700" />
                   <div>
-                    <p className="font-semibold text-[#0B2545]">{issue.label}</p>
+                    <p className="font-semibold text-[#2563EB]">{issue.label}</p>
                     <p className="mt-1 text-xs leading-5 text-slate-600">{issue.description}</p>
                     {issue.difference > 0 && (
                       <p className="mt-1 text-[11px] font-semibold text-amber-800">
@@ -230,7 +230,7 @@ export function PensumValidationModule({
       {/* Dynamic issues from Supabase data */}
       {issues.length > 0 && (
         <div className="flex flex-col gap-3">
-          <p className="text-sm font-semibold text-[#0B2545]">Validación en tiempo real (datos de Supabase)</p>
+          <p className="text-sm font-semibold text-[#2563EB]">Validación en tiempo real (datos de Supabase)</p>
           {issues.map((issue) => {
             const Icon = ISSUE_ICON[issue.kind]
             return (
@@ -243,7 +243,7 @@ export function PensumValidationModule({
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[10px] font-bold uppercase tracking-wide text-slate-500">{issue.scope}</span>
                   </div>
-                  <p className="mt-1 font-semibold text-[#0B2545]">{issue.title}</p>
+                  <p className="mt-1 font-semibold text-[#2563EB]">{issue.title}</p>
                   <p className="mt-1 text-xs leading-5 text-slate-600">{issue.detail}</p>
                   {issue.declared !== undefined && issue.computed !== undefined && (
                     <p className="mt-1.5 text-[11px] font-mono text-slate-500">
